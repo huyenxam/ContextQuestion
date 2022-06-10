@@ -15,7 +15,7 @@ def evaluate(prediction, mode):
         
     f1 = exact_match = total = 0
     
-    list_sample = InputSample(path=path, max_char_len=10).get_sample()
+    list_sample = InputSample(path=path, max_char_len=10, max_seq_length=250, stride=10).get_sample()
     for i, sample in enumerate(list_sample):
 
         context = sample['context']
@@ -38,8 +38,8 @@ def evaluate(prediction, mode):
             f1_idx.append(f1_score(label_prediction, ground_truth))
             extract_match_idx.append(exact_match_score(label_prediction, ground_truth))
 
-            print(ground_truth)
-            print(label_prediction)
+            # print(ground_truth)
+            # print(label_prediction)
 
 
         f1 += max(f1_idx)

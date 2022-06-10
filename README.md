@@ -18,8 +18,8 @@ Pytorch implementation of Analyzing Vietnamese Legal Question using Deep Neural 
 ## Training & Evaluation
 
 ```bash
-git clone https://github.com/anhtunguyen98/NER-biaffine.git
-cd NER-biaffine
+git clone https://github.com/huyenxam/QA-Biaffine.git
+cd QA-Biaffine
 pip install -r requirements.txt
 bash train.sh
 ```
@@ -38,4 +38,4 @@ bash train.sh
 
 - [Huggingface Transformers](https://github.com/huggingface/transformers)
 
-# ContextQuestion
+# QA-Biaffine

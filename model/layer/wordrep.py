@@ -33,6 +33,3 @@ class WordRep(nn.Module):
             return torch.cat((bert_features,  char_features), dim=-1)
         else:
             return bert_features
-
-        
-

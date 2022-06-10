@@ -1,13 +1,15 @@
+from cProfile import label
 import torch
 import json
-from torch.utils.data import Dataset
 import numpy as np
-
+from torch.utils.data import Dataset
 
 
 class InputSample(object):
-    def __init__(self, path='../data/train.json', max_char_len=None):
+    def __init__(self, path, max_char_len=None, max_seq_length=None, stride=None):
+        self.stride = stride
         self.max_char_len = max_char_len
+        self.max_seq_length = max_seq_length
         self.list_sample = []
         with open(path, 'r', encoding='utf8') as f:
             self.list_sample = json.load(f)
@@ -25,10 +27,7 @@ class InputSample(object):
     def get_sample(self):
         for i, sample in enumerate(self.list_sample):
             context = sample['context'].split(' ')
-            sample['context'] = context
-
             question = sample['question'].split(' ')
-            sample['question'] = question
 
             sentence = question + context
             char_seq = []
@@ -37,24 +36,30 @@ class InputSample(object):
                 char_seq.append(character)
             sample['char_sequence'] = char_seq
 
-            label = sample['label']
+            labels = sample['label']
             label_idxs = []
-            for lb in label:
-                ans_start = int(lb[1]) + len(question) + 2
-                ans_end = int(lb[2]) + len(question) + 2
+            for lb in labels:
+                start = int(lb[1])
+                end = int(lb[2])
                 entity = lb[0]
-                label_idxs.append([entity, ans_start, ans_end])
+                if start != 0 and end != 0:
+                    start = start + len(question) + 2
+                    end = end + len(question) + 2
+
+                label_idxs.append([entity, start, end])
+                
             sample['label_idx'] = label_idxs
             self.list_sample[i] = sample
+
         return self.list_sample
 
 
 class MyDataSet(Dataset):
 
     def __init__(self, path, char_vocab_path, label_set_path,
-                 max_char_len, tokenizer, max_seq_length):
+                 max_char_len, tokenizer, max_seq_length, stride):
 
-        self.samples = InputSample(path=path, max_char_len=max_char_len).get_sample()
+        self.samples = InputSample(path=path, max_char_len=max_char_len, max_seq_length=max_seq_length, stride=stride).get_sample()
         self.tokenizer = tokenizer
         self.max_seq_length = max_seq_length
         self.max_char_len = max_char_len
@@ -126,14 +131,20 @@ class MyDataSet(Dataset):
         start, end, entity = [], [], []
         label = np.unique(label, axis=0).tolist()
         for lb in label:
-            start.append(lb[1])
-            end.append(lb[2])
+            if int(lb[1]) > self.max_seq_length or int(lb[2]) > self.max_seq_length:
+                start.append(0)
+                end.append(0)
+            else:
+                start.append(int(lb[1]))
+                end.append(int(lb[2]))
             try:
                 entity.append(self.label_2int[lb[0]])
             except:
                 print(lb)
+        
         label = torch.sparse.FloatTensor(torch.tensor([start, end], dtype=torch.int64), torch.tensor(entity),
                                          torch.Size([self.max_seq_length, self.max_seq_length])).to_dense()
+        
         return label
 
     def __getitem__(self, index):
@@ -142,12 +153,13 @@ class MyDataSet(Dataset):
         context = sample['context']
         question = sample['question']
         char_seq = sample['char_sequence']
-        seq_length = len(question) + len(context) + 2
+        seq_length = len(question) + len(context) + 2        
         label = sample['label_idx']
         input_ids, attention_mask, firstSWindices = self.preprocess(self.tokenizer, context, question, self.max_seq_length)
 
         char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)
-
+        if seq_length > self.max_seq_length:
+          seq_length = self.max_seq_length
         label = self.span_maxtrix_label(label)
 
         return input_ids, attention_mask, firstSWindices, torch.tensor([seq_length]), char_ids, label.long()
@@ -176,6 +188,3 @@ def get_useful_ones(out, label, mask):
     tmp_label = tmp_label.index_select(0, indices)
 
     return tmp_out, tmp_label
-
-
-

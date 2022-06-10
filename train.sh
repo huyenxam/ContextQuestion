@@ -1,11 +1,12 @@
 #!/bin/bash
-export TRAIN_PATH="data/Data/train.json"
-export DEV_PATH="data/Data/dev.json"
-export TEST_PATH="data/Data/test.json"
+export TRAIN_PATH="DataNew/train_ViQuAD.json"
+export DEV_PATH="DataNew/dev_ViQuAD.json"
+export TEST_PATH="DataNew/test_ViQuAD.json"
 export CHAR_VOCAB_PATH="data/charindex.json"
 export LABEL_SET_PATH="data/label_set.txt"
 export MAX_CHAR_LEN=20
 export MAX_SEQ_LENGTH=250
+export STRIDE=10
 export BATCH_SIZE=32
 export CHAR_EMBEDDING_DIM=100
 export CHAR_HIDDEN_DIM=200
@@ -13,7 +14,7 @@ export NUM_BERT_LAYER=1
 export CHAR_VOCAB_SIZE=108
 export HIDDEN_DIM=728
 export HIDDEN_DIM_FFW=300
-export NUM_LABELS=12
+export NUM_LABELS=2
 export MODEL_NAME_OR_PATH="vinai/phobert-base"
 export NUM_EPOCHS=30
 export LEARNING_RATE=5e-5
@@ -27,6 +28,7 @@ python train.py --train_path $TRAIN_PATH \
                 --max_char_len $MAX_CHAR_LEN  \
                 --dev_path $DEV_PATH \
                 --max_seq_length $MAX_SEQ_LENGTH \
+                --stride $STRIDE \
                 --batch_size $BATCH_SIZE \
                 --char_embedding_dim $CHAR_EMBEDDING_DIM \
                 --char_hidden_dim $CHAR_HIDDEN_DIM \
