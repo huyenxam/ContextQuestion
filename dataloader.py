@@ -1,4 +1,3 @@
-from cProfile import label
 import torch
 import json
 import numpy as np
@@ -25,33 +24,36 @@ class InputSample(object):
         return word_seq
 
     def get_sample(self):
+        l_sample = []
         for i, sample in enumerate(self.list_sample):
             context = sample['context'].split(' ')
-            question = sample['question'].split(' ')
+            sample['context'] = context
 
-            sentence = question + context
+            question = sample['question'].split(' ')
+            sample['question'] = question
+
+            sent = question + context
             char_seq = []
-            for word in sentence:
+            for word in sent:
                 character = self.get_character(word, self.max_char_len)
                 char_seq.append(character)
             sample['char_sequence'] = char_seq
-
-            labels = sample['label']
+            label = sample['label']
+            entity =label[0]
+            ans_start = label[1]
+            ans_end = label[2]
+            if ans_end == 0 and ans_start == 0:
+                ans_start = len(question) + 2
+                ans_end = len(question) + 2
+            else:
+                ans_start = label[1] + len(question) + 2
+                ans_end = label[2] +  len(question) + 2
             label_idxs = []
-            for lb in labels:
-                start = int(lb[1])
-                end = int(lb[2])
-                entity = lb[0]
-                if start != 0 and end != 0:
-                    start = start + len(question) + 2
-                    end = end + len(question) + 2
-
-                label_idxs.append([entity, start, end])
-                
+            label_idxs.append([entity, ans_start, ans_end])
             sample['label_idx'] = label_idxs
-            self.list_sample[i] = sample
+            l_sample.append(sample)
 
-        return self.list_sample
+        return l_sample
 
 
 class MyDataSet(Dataset):
