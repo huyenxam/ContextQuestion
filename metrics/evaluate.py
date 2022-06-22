@@ -15,7 +15,7 @@ def evaluate(prediction, mode):
         
     f1 = exact_match = total = 0
     
-    list_sample = InputSample(path=path, max_char_len=10, max_seq_length=250, stride=10).get_sample()
+    list_sample = InputSample(path=path, max_char_len=10, max_seq_length=250).get_sample()
     for i, sample in enumerate(list_sample):
 
         context = sample['context']
