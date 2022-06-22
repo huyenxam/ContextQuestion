@@ -5,8 +5,7 @@ from torch.utils.data import Dataset
 
 
 class InputSample(object):
-    def __init__(self, path, max_char_len=None, max_seq_length=None, stride=None):
-        self.stride = stride
+    def __init__(self, path, max_char_len=None, max_seq_length=None):
         self.max_char_len = max_char_len
         self.max_seq_length = max_seq_length
         self.list_sample = []
@@ -59,9 +58,9 @@ class InputSample(object):
 class MyDataSet(Dataset):
 
     def __init__(self, path, char_vocab_path, label_set_path,
-                 max_char_len, tokenizer, max_seq_length, stride):
+                 max_char_len, tokenizer, max_seq_length):
 
-        self.samples = InputSample(path=path, max_char_len=max_char_len, max_seq_length=max_seq_length, stride=stride).get_sample()
+        self.samples = InputSample(path=path, max_char_len=max_char_len, max_seq_length=max_seq_length).get_sample()
         self.tokenizer = tokenizer
         self.max_seq_length = max_seq_length
         self.max_char_len = max_char_len
