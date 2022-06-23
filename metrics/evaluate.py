@@ -3,7 +3,7 @@ from metrics.f1_score import f1_score
 from metrics.exact_match_score import exact_match_score
 from dataloader import *
 
-def evaluate(prediction, mode):
+def evaluate(outputs, mode):
     list_sample = []
 
     if mode == 'dev':
@@ -39,8 +39,8 @@ def evaluate(prediction, mode):
               end = end + len(question) + 2
               ground_truth = " ".join(sentence[start:end])
             
-              start_pre = int(prediction[i][1])
-              end_pre = int(prediction[i][2])
+              start_pre = int(outputs[1])
+              end_pre = int(outputs[2])
               label_prediction = " ".join(sentence[start_pre:end_pre+1])
               f1_idx.append(f1_score(label_prediction, ground_truth))
               extract_match_idx.append(exact_match_score(label_prediction, ground_truth))

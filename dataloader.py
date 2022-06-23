@@ -26,29 +26,37 @@ class InputSample(object):
         l_sample = []
         for i, sample in enumerate(self.list_sample):
             context = sample['context'].split(' ')
-            sample['context'] = context
-
+            
             question = sample['question'].split(' ')
             sample['question'] = question
 
             sent = question + context
+            if len(sent) > self.max_seq_length:
+                context = context[:self.max_seq_length-2]
+            sample['context'] = context
+
             char_seq = []
             for word in sent:
                 character = self.get_character(word, self.max_char_len)
                 char_seq.append(character)
             sample['char_sequence'] = char_seq
-            label = sample['label']
-            entity =label[0]
-            ans_start = label[1]
-            ans_end = label[2]
-            if ans_end == 0 and ans_start == 0:
-                ans_start = len(question) + 2
-                ans_end = len(question) + 2
-            else:
-                ans_start = label[1] + len(question) + 2
-                ans_end = label[2] +  len(question) + 2
+            labels = sample['label']
             label_idxs = []
-            label_idxs.append([entity, ans_start, ans_end])
+            for lb in labels:
+                entity =lb[0]
+                ans_start = lb[1]
+                ans_end = lb[2]
+                if ans_end == 0 and ans_start == 0:
+                    ans_start = len(question) + 2
+                    ans_end = len(question) + 2
+                elif ans_end > self.max_seq_length:
+                    ans_start = ans_start + len(question) + 2
+                    ans_end = self.max_seq_length - 1
+                else:
+                    ans_start = ans_start + len(question) + 2
+                    ans_end = ans_end +  len(question) + 2
+                label_idxs.append([entity, ans_start, ans_end])
+
             sample['label_idx'] = label_idxs
             l_sample.append(sample)
 
@@ -126,6 +134,8 @@ class MyDataSet(Dataset):
             char_ids.append(word_char_ids)
         if len(char_ids) < max_seq_length:
             char_ids += [[self.char_vocab['PAD']] * self.max_char_len] * (max_seq_length - len(char_ids))
+        else:
+            char_ids = char_ids[:max_seq_length]
         return torch.tensor(char_ids)
 
     def span_maxtrix_label(self, label):

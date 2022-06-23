@@ -17,18 +17,10 @@ def get_pred_entity(cate_pred, span_scores,label_set, is_flat_ner= True):
                 tmp = (label_set[cate_pred[i][j].item()], i, j,span_scores[i][j].item())
                 top_span.append(tmp)
     top_span = sorted(top_span, reverse=True, key=lambda x: x[3])
-    res_entity = []
-    for t, ns, ne, _ in top_span:
-        for _,ts, te, in res_entity:
-            if ns < ts <= ne < te or ts < ns <= te < ne:
-                # for both nested and flat ner no clash is allowed
-                break
-            if is_flat_ner and (ns <= ts <= te <= ne or ts <= ns <= ne <= te):
-                # for flat ner nested mentions are not allowed
-                break
-        else:
-            res_entity.append((t,ns, ne))
-    return set(res_entity)
+    if not top_span:
+        top_span = [('ANSWER', 0, 0)]
+
+    return top_span[0]
 
 class Trainer(object):
     def __init__(self, args, train_dataset=None, dev_dataset=None, test_dataset=None):
@@ -92,12 +84,6 @@ class Trainer(object):
 
                 output = self.model(**inputs)
 
-                # for i in range(len(output)):
-                #     input_tensor, cate_pred = output[i].max(dim=-1)
-                #     label1 = get_pred_entity(cate_pred, input_tensor, self.label_set, True)
-                #     # labels.append(label1)
-                #     print(label1)
-
                 optimizer.zero_grad()
                 mask = get_mask(max_length=self.args.max_seq_length, seq_length=seq_length)
                 mask = mask.to(self.device)
@@ -146,21 +132,22 @@ class Trainer(object):
             seq_length = batch[3]
             with torch.no_grad():
                 output = self.model(**inputs)
+                for i in range(len(output)):
+                    input_tensor, cate_pred = output[i].max(dim=-1)
+                    label_pred = get_pred_entity(cate_pred, input_tensor, self.label_set, True)
+                    # labels.append(label1)
+                    outputs.append(label_pred)
+
+
             seq_lengths.append(seq_length)
             mask = get_mask(max_length=self.args.max_seq_length, seq_length=seq_length)
             mask = mask.to(self.device)
 
             tmp_out, tmp_label = get_useful_ones(output, label, mask)
-            labels.append(label)
-            outputs.append(output)
             loss = loss_func(tmp_out, tmp_label)
             eval_loss += loss.item()
-        labels = torch.cat(labels, dim=0)
-        outputs = torch.cat(outputs, dim=0)
-        seq_lengths = torch.cat(seq_lengths, dim=0)
 
-        predictions = batch_computeF1(labels, outputs, seq_lengths, self.label_set)
-        exact_match, f1 = evaluate(predictions, mode)
+        exact_match, f1 = evaluate(outputs, mode)
 
         print()
         print(exact_match)
