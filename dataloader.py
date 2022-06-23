@@ -44,8 +44,8 @@ class InputSample(object):
             label_idxs = []
             for lb in labels:
                 entity =lb[0]
-                ans_start = lb[1]
-                ans_end = lb[2]
+                ans_start = int(lb[1])
+                ans_end = int(lb[2])
                 if ans_end == 0 and ans_start == 0:
                     ans_start = len(question) + 2
                     ans_end = len(question) + 2

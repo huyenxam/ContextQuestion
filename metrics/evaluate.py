@@ -24,6 +24,9 @@ def evaluate(outputs, mode):
 
         labels = sample['label_idx']
 
+        start_pre = int(outputs[i][1])
+        end_pre = int(outputs[i][2])
+
         f1_idx = [0]
         extract_match_idx = [0]
         for lb in labels:
@@ -33,20 +36,21 @@ def evaluate(outputs, mode):
             # print(start)
             # print(end)
             if start == 0 and end == 0:
-              ground_truth = 'cls'
+                ground_truth = 'cls'
+            elif start_pre == 0 and end_pre == 0:
+                ground_truth = 'cls'
             else:
-              start = start + len(question) + 2
-              end = end + len(question) + 2
-              ground_truth = " ".join(sentence[start:end])
-            
-              start_pre = int(outputs[1])
-              end_pre = int(outputs[2])
-              label_prediction = " ".join(sentence[start_pre:end_pre+1])
-              f1_idx.append(f1_score(label_prediction, ground_truth))
-              extract_match_idx.append(exact_match_score(label_prediction, ground_truth))
-              total += 1
-              print(ground_truth)
-              print(label_prediction)
+                start = start + len(question) + 2
+                end = end + len(question) + 2
+                ground_truth = " ".join(sentence[start:end])
+                
+
+                label_prediction = " ".join(sentence[start_pre:end_pre+1])
+                f1_idx.append(f1_score(label_prediction, ground_truth))
+                extract_match_idx.append(exact_match_score(label_prediction, ground_truth))
+                total += 1
+                print(ground_truth)
+                print(label_prediction)
 
 
         f1 += max(f1_idx)
