@@ -30,18 +30,12 @@ def evaluate(outputs, mode):
         f1_idx = [0]
         extract_match_idx = [0]
         for lb in labels:
+            start = lb[1]
+            end = lb[2]
 
-            start = lb[1] - len(question) - 2
-            end = lb[2] - len(question) - 2
-            # print(start)
-            # print(end)
-            if start == 0 and end == 0:
-                ground_truth = 'cls'
-            elif start_pre == 0 and end_pre == 0:
+            if start_pre == 0 and end_pre == 0:
                 ground_truth = 'cls'
             else:
-                start = start + len(question) + 2
-                end = end + len(question) + 2
                 ground_truth = " ".join(sentence[start:end])
                 
 
