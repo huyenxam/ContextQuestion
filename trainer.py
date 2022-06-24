@@ -18,7 +18,7 @@ def get_pred_entity(cate_pred, span_scores,label_set, is_flat_ner= True):
                 top_span.append(tmp)
     top_span = sorted(top_span, reverse=True, key=lambda x: x[3])
     if not top_span:
-        return top_span
+        return ['ANSWER', 0, 0, 0]
     return top_span[0]
 
 class Trainer(object):

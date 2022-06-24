@@ -11,6 +11,7 @@ class InputSample(object):
         self.list_sample = []
         with open(path, 'r', encoding='utf8') as f:
             self.list_sample = json.load(f)
+        self.list_sample = self.list_sample[:10]
         
     def get_character(self, word, max_char_len):
         word_seq = []
@@ -41,22 +42,23 @@ class InputSample(object):
             
             label = sample['label'][0]
             entity = label[0]
-            start = label[1]
-            end = label[2]
+            start = int(label[1])
+            end = int(label[2])
             ans_list = []
             for lb in sample['label']:
-                s = lb[1]
-                e = lb[2]
-                ans_list.append(text_context[s:e+1])
+                s = int(lb[1])
+                e = int(lb[2])
+                ans_list.append(" ".join(text_context[s:e+1]))
 
             len_ctx = 0
             label_list = []
             for ctx in context:
                 qa_dict = {}
-                qa_dict['context'] = ctx.split(" ")
+                qa_dict['context'] = ctx
                 qa_dict['char_sequence'] = char_seq
                 qa_dict['question'] = text_question
                 qa_dict['answer'] = ans_list
+                qa_dict['sample'] = i
 
                 start_ctx = 0
                 end_ctx = 0
@@ -65,10 +67,9 @@ class InputSample(object):
                     end_ctx = end - len_ctx + len(text_question) + 2
                 label_list.append([entity, start_ctx, end_ctx])
                 qa_dict['label_idx'] = label_list
-                qa_dict[label]
                 len_ctx = len_ctx + len(ctx)
 
-                l_sample.append(sample)
+                l_sample.append(qa_dict)
 
         return l_sample
 
@@ -175,7 +176,7 @@ class MyDataSet(Dataset):
         question = sample['question']
         char_seq = sample['char_sequence']
         seq_length = len(question) + len(context) + 2        
-        label = sample['label']
+        label = sample['label_idx']
         input_ids, attention_mask, firstSWindices = self.preprocess(self.tokenizer, context, question, self.max_seq_length)
 
         char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)

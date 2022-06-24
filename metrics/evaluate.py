@@ -2,6 +2,7 @@ import json
 from metrics.f1_score import f1_score
 from metrics.exact_match_score import exact_match_score
 from dataloader import *
+import numpy as np
 
 def evaluate(prediction, mode):
     list_sample = []
@@ -14,7 +15,7 @@ def evaluate(prediction, mode):
         raise Exception("Only dev and test dataset available")
 
     f1 = exact_match = 0        
-    output = []
+    output = np.zeros(2000) 
     inputs = InputSample(path=path, max_char_len=10, max_seq_length=250).get_sample()
 
     j = -1
