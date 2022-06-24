@@ -11,7 +11,7 @@ class InputSample(object):
         self.list_sample = []
         with open(path, 'r', encoding='utf8') as f:
             self.list_sample = json.load(f)
-
+        
     def get_character(self, word, max_char_len):
         word_seq = []
         for j in range(max_char_len):
@@ -25,40 +25,50 @@ class InputSample(object):
     def get_sample(self):
         l_sample = []
         for i, sample in enumerate(self.list_sample):
-            context = sample['context'].split(' ')
+            text_question = sample['question'].split(' ')
             
-            question = sample['question'].split(' ')
-            sample['question'] = question
+            context = sample['context']
+            text_context = ""
+            for item in context:
+              text_context += " ".join(item) + " "
+            text_context = text_context[:-1].split(' ')
 
-            sent = question + context
-            if len(sent) > self.max_seq_length:
-                context = context[:self.max_seq_length-2]
-            sample['context'] = context
-
+            sent = text_question + text_context
             char_seq = []
             for word in sent:
                 character = self.get_character(word, self.max_char_len)
                 char_seq.append(character)
-            sample['char_sequence'] = char_seq
-            labels = sample['label']
-            label_idxs = []
-            for lb in labels:
-                entity =lb[0]
-                ans_start = int(lb[1])
-                ans_end = int(lb[2])
-                if ans_end == 0 and ans_start == 0:
-                    ans_start = len(question) + 2
-                    ans_end = len(question) + 2
-                elif ans_end > self.max_seq_length:
-                    ans_start = ans_start + len(question) + 2
-                    ans_end = self.max_seq_length - 1
-                else:
-                    ans_start = ans_start + len(question) + 2
-                    ans_end = ans_end +  len(question) + 2
-                label_idxs.append([entity, ans_start, ans_end])
+            
+            label = sample['label'][0]
+            entity = label[0]
+            start = label[1]
+            end = label[2]
+            ans_list = []
+            for lb in sample['label']:
+                s = lb[1]
+                e = lb[2]
+                ans_list.append(text_context[s:e+1])
 
-            sample['label_idx'] = label_idxs
-            l_sample.append(sample)
+            len_ctx = 0
+            label_list = []
+            for ctx in context:
+                qa_dict = {}
+                qa_dict['context'] = ctx.split(" ")
+                qa_dict['char_sequence'] = char_seq
+                qa_dict['question'] = text_question
+                qa_dict['answer'] = ans_list
+
+                start_ctx = 0
+                end_ctx = 0
+                if start >= len_ctx and end <= (len_ctx + len(ctx) -1):
+                    start_ctx = start - len_ctx + len(text_question) + 2
+                    end_ctx = end - len_ctx + len(text_question) + 2
+                label_list.append([entity, start_ctx, end_ctx])
+                qa_dict['label_idx'] = label_list
+                qa_dict[label]
+                len_ctx = len_ctx + len(ctx)
+
+                l_sample.append(sample)
 
         return l_sample
 
@@ -165,7 +175,7 @@ class MyDataSet(Dataset):
         question = sample['question']
         char_seq = sample['char_sequence']
         seq_length = len(question) + len(context) + 2        
-        label = sample['label_idx']
+        label = sample['label']
         input_ids, attention_mask, firstSWindices = self.preprocess(self.tokenizer, context, question, self.max_seq_length)
 
         char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)

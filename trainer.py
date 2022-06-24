@@ -18,8 +18,7 @@ def get_pred_entity(cate_pred, span_scores,label_set, is_flat_ner= True):
                 top_span.append(tmp)
     top_span = sorted(top_span, reverse=True, key=lambda x: x[3])
     if not top_span:
-        top_span = [('ANSWER', 0, 0)]
-
+        return top_span
     return top_span[0]
 
 class Trainer(object):
@@ -135,9 +134,7 @@ class Trainer(object):
                 for i in range(len(output)):
                     input_tensor, cate_pred = output[i].max(dim=-1)
                     label_pred = get_pred_entity(cate_pred, input_tensor, self.label_set, True)
-                    # labels.append(label1)
                     outputs.append(label_pred)
-
 
             seq_lengths.append(seq_length)
             mask = get_mask(max_length=self.args.max_seq_length, seq_length=seq_length)
