@@ -136,6 +136,7 @@ class Trainer(object):
                 for i in range(len(output)):
                     input_tensor, cate_pred = output[i].max(dim=-1)
                     label_pred = get_pred_entity(cate_pred, input_tensor, self.label_set, True)
+                    print(label_pred)
                     outputs.append(label_pred)
 
             seq_lengths.append(seq_length)

@@ -11,7 +11,7 @@ class InputSample(object):
         self.list_sample = []
         with open(path, 'r', encoding='utf8') as f:
             self.list_sample = json.load(f)
-        self.list_sample = self.list_sample[:10]
+        # self.list_sample = self.list_sample[:10]
         
     def get_character(self, word, max_char_len):
         word_seq = []
