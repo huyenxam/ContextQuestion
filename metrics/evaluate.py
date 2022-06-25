@@ -37,8 +37,8 @@ def evaluate(prediction, mode):
                 extract_match_idx = [0]
                 answers = inputs[i-1]['answer']
                 for ans in answers:
-                    print(label_prediction)
-                    print(ans)
+                    # print(label_prediction)
+                    # print(ans)
                     f1_idx.append(f1_score(label_prediction, ans))
                     extract_match_idx.append(exact_match_score(label_prediction, ans))
 
