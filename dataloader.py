@@ -51,9 +51,9 @@ class InputSample(object):
                 ans_list.append(" ".join(text_context[s:e+1]))
 
             len_ctx = 0
-            label_list = []
             for ctx in context:
                 qa_dict = {}
+                label_list = []
                 qa_dict['context'] = ctx
                 qa_dict['char_sequence'] = char_seq
                 qa_dict['question'] = text_question

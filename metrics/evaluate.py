@@ -4,27 +4,25 @@ from metrics.exact_match_score import exact_match_score
 from dataloader import *
 import numpy as np
 
-def evaluate(prediction, mode):
-    list_sample = []
-
-    if mode == 'dev':
-        path = 'data/Data/dev_ViQuAD.json'
-    elif mode == 'test':
-        path = 'data/Data/test_ViQuAD.json'
-    else:
-        raise Exception("Only dev and test dataset available")
+def evaluate(prediction, max_char_len, max_seq_length, path):
+    # if mode == 'dev':
+    #     path = 'data/Data/dev_ViQuAD.json'
+    # elif mode == 'test':
+    #     path = 'data/Data/test_ViQuAD.json'
+    # else:
+    #     raise Exception("Only dev and test dataset available")
 
     f1 = exact_match = 0        
     output = np.zeros(2000) 
-    inputs = InputSample(path=path, max_char_len=10, max_seq_length=250).get_sample()
+    inputs = InputSample(path=path, max_char_len=max_char_len, max_seq_length=max_seq_length).get_sample()
 
     j = -1
     label_prediction = ""
     idx = 0
-    for i, input in enumerate(inputs):
-        idx = input['sample']
-        context = input['context']
-        question = input['question']
+    for i, sample in enumerate(inputs):
+        idx = sample['sample']
+        context = sample['context']
+        question = sample['question']
         sentence = ['cls'] + question + ['sep'] +  context
 
         if idx > j:

@@ -106,8 +106,10 @@ class Trainer(object):
     def eval(self, mode):
         if mode == 'dev':
             dataset = self.dev_dataset
+            path = self.args.dev_path
         elif mode == 'test':
             dataset = self.test_dataset
+            path = self.args.test_path
         else:
             raise Exception("Only dev and test dataset available")
 
@@ -144,7 +146,7 @@ class Trainer(object):
             loss = loss_func(tmp_out, tmp_label)
             eval_loss += loss.item()
 
-        exact_match, f1 = evaluate(outputs, mode)
+        exact_match, f1 = evaluate(outputs, self.args.max_char_len, self.args.max_seq_length, path)
 
         print()
         print(exact_match)
