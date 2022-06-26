@@ -54,9 +54,12 @@ class InputSample(object):
             for ctx in context:
                 qa_dict = {}
                 label_list = []
+                qa_dict['question'] = text_question
+                length_ctx = self.max_seq_length - len(text_question) - 2
+                if len(ctx) > length_ctx:
+                  ctx = ctx[:length_ctx]
                 qa_dict['context'] = ctx
                 qa_dict['char_sequence'] = char_seq
-                qa_dict['question'] = text_question
                 qa_dict['answer'] = ans_list
                 qa_dict['sample'] = i
                 se = ['cls'] + text_question + ['sep'] +  ctx
