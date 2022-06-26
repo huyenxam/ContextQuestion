@@ -66,6 +66,8 @@ class InputSample(object):
                 if start >= len_ctx and end <= (len_ctx + len(ctx) -1):
                     start_ctx = start - len_ctx + len(text_question) + 2
                     end_ctx = end - len_ctx + len(text_question) + 2
+                    if end_ctx > self.max_seq_length:
+                        end_ctx = self.max_seq_length - 1
                     # print(se[start_ctx:end_ctx + 1])
                     # print(ans_list)
                     label_list.append([entity, start_ctx, end_ctx])
