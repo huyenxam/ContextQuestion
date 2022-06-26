@@ -1,11 +1,11 @@
 #!/bin/bash
 export TRAIN_PATH="data/Data/train_ViQuAD.json"
-export DEV_PATH="data/Data/dev100.json"
-export TEST_PATH="data/Data/test100.json"
+export DEV_PATH="data/Data/dev.json"
+export TEST_PATH="data/Data/test.json"
 export CHAR_VOCAB_PATH="data/charindex.json"
 export LABEL_SET_PATH="data/label_set.txt"
 export MAX_CHAR_LEN=20
-export MAX_SEQ_LENGTH=250
+export MAX_SEQ_LENGTH=100
 export BATCH_SIZE=32
 export CHAR_EMBEDDING_DIM=100
 export CHAR_HIDDEN_DIM=200
