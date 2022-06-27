@@ -13,7 +13,7 @@ def evaluate(prediction, max_char_len, max_seq_length, path):
     #     raise Exception("Only dev and test dataset available")
 
     f1 = exact_match = 0        
-    output = np.zeros(2000) 
+    output = np.zeros(20000) 
     inputs = InputSample(path=path, max_char_len=max_char_len, max_seq_length=max_seq_length).get_sample()
 
     j = -1
