@@ -54,8 +54,8 @@ class InputSample(object):
                 labels = sample['label']
                 for lb in labels:
                     entity = lb[0]
-                    start = lb[1]
-                    end = lb[2]
+                    start = int(lb[1])
+                    end = int(lb[2])
 
                     start_ctx = 0
                     end_ctx = 0
