@@ -120,7 +120,7 @@ class Trainer(object):
         self.model.eval()
         loss_func = torch.nn.CrossEntropyLoss(reduction='mean')
         eval_loss = 0
-        labels, outputs, seq_lengths = [], [], []
+        outputs = []
         for batch in eval_dataloader:
             batch = tuple(t.to(self.device) for t in batch)
 
@@ -139,7 +139,6 @@ class Trainer(object):
                     # print(label_pred)
                     outputs.append(label_pred)
 
-            seq_lengths.append(seq_length)
             mask = get_mask(max_length=self.args.max_seq_length, seq_length=seq_length)
             mask = mask.to(self.device)
 

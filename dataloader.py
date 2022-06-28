@@ -59,7 +59,7 @@ class InputSample(object):
 
                     start_ctx = 0
                     end_ctx = 0
-                    if start >= len_ctx and end <= (len_ctx + len(ctx) -1):
+                    if start >= len_ctx and end <= (len_ctx + len(ctx) - 1):
                         start_ctx = start - len_ctx + len(text_question) + 2
                         end_ctx = end - len_ctx + len(text_question) + 2
                         if end_ctx > self.max_seq_length:
