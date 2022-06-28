@@ -39,16 +39,6 @@ class InputSample(object):
             for word in sent:
                 character = self.get_character(word, self.max_char_len)
                 char_seq.append(character)
-            
-            label = sample['label'][0]
-            entity = label[0]
-            start = int(label[1])
-            end = int(label[2])
-            ans_list = []
-            for lb in sample['label']:
-                s = int(lb[1])
-                e = int(lb[2])
-                ans_list.append(" ".join(text_context[s:e+1]))
 
             len_ctx = 0
             for ctx in context:
@@ -60,20 +50,21 @@ class InputSample(object):
                   ctx = ctx[:length_ctx]
                 qa_dict['context'] = ctx
                 qa_dict['char_sequence'] = char_seq
-                qa_dict['answer'] = ans_list
-                qa_dict['sample'] = i
-                se = ['cls'] + text_question + ['sep'] +  ctx
+                
+                labels = sample['label']
+                for lb in labels:
+                    entity = lb[0]
+                    start = lb[1]
+                    end = lb[2]
 
-                start_ctx = 0
-                end_ctx = 0
-                if start >= len_ctx and end <= (len_ctx + len(ctx) -1):
-                    start_ctx = start - len_ctx + len(text_question) + 2
-                    end_ctx = end - len_ctx + len(text_question) + 2
-                    if end_ctx > self.max_seq_length:
-                        end_ctx = self.max_seq_length - 1
-                    # print(se[start_ctx:end_ctx + 1])
-                    # print(ans_list)
-                    label_list.append([entity, start_ctx, end_ctx])
+                    start_ctx = 0
+                    end_ctx = 0
+                    if start >= len_ctx and end <= (len_ctx + len(ctx) -1):
+                        start_ctx = start - len_ctx + len(text_question) + 2
+                        end_ctx = end - len_ctx + len(text_question) + 2
+                        if end_ctx > self.max_seq_length:
+                            end_ctx = self.max_seq_length - 1
+                        label_list.append([entity, start_ctx, end_ctx])
                 qa_dict['label_idx'] = label_list
                 len_ctx = len_ctx + len(ctx)
 
