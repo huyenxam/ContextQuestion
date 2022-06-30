@@ -62,8 +62,9 @@ class InputSample(object):
                     if start >= len_ctx and end <= (len_ctx + len(ctx) - 1):
                         start_ctx = start - len_ctx + len(text_question) + 2
                         end_ctx = end - len_ctx + len(text_question) + 2
-                        if end_ctx > self.max_seq_length:
+                        if end_ctx >= self.max_seq_length:
                             end_ctx = self.max_seq_length - 1
+
                         label_list.append([entity, start_ctx, end_ctx])
                 qa_dict['label_idx'] = label_list
                 len_ctx = len_ctx + len(ctx)
